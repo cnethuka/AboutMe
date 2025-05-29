@@ -36,7 +36,74 @@
                     }
                 }, { once: true });
             });
+            
+            // Initialize bouncing Minecraft logo
+            initBouncingLogo();
         });
+        
+        function initBouncingLogo() {
+            const logo = document.getElementById('minecraft-logo');
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const logoWidth = 100;
+            const logoHeight = 60;
+            
+            // Initial position
+            let x = Math.random() * (windowWidth - logoWidth);
+            let y = Math.random() * (windowHeight - logoHeight);
+            
+            // Initial velocity
+            let dx = 2.5;
+            let dy = 2.5;
+            
+            // Track color changes for DVD logo effect
+            let hue = 0;
+            
+            function updateLogoPosition() {
+                // Update position
+                x += dx;
+                y += dy;
+                
+                // Check for collision with edges
+                if (x <= 0 || x >= windowWidth - logoWidth) {
+                    dx = -dx;
+                    x = Math.max(0, Math.min(x, windowWidth - logoWidth));
+                    changeColor();
+                }
+                
+                if (y <= 0 || y >= windowHeight - logoHeight) {
+                    dy = -dy;
+                    y = Math.max(0, Math.min(y, windowHeight - logoHeight));
+                    changeColor();
+                }
+                
+                // Apply new position
+                logo.style.left = x + 'px';
+                logo.style.top = y + 'px';
+                
+                // Continue animation
+                requestAnimationFrame(updateLogoPosition);
+            }
+            
+            function changeColor() {
+                // Change color like the DVD logo
+                hue = (hue + 60) % 360;
+                logo.style.filter = `drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)) hue-rotate(${hue}deg)`;
+            }
+            
+            // Start animation
+            updateLogoPosition();
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const newWindowWidth = window.innerWidth;
+                const newWindowHeight = window.innerHeight;
+                
+                // Adjust position if logo would be outside new window bounds
+                x = Math.min(x, newWindowWidth - logoWidth);
+                y = Math.min(y, newWindowHeight - logoHeight);
+            });
+        }
     </script>
     <style>
         body {
@@ -115,9 +182,25 @@
             cursor: pointer;
             z-index: 101;
         }
+        #minecraft-logo {
+            position: fixed;
+            width: 100px;
+            height: 60px;
+            z-index: 100;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+            transition: transform 0.2s ease;
+            opacity: 0.7;
+        }
+        #minecraft-logo:hover {
+            transform: scale(1.2);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 text-gray-100">
+    <img id="minecraft-logo" src="https://www.minecraft.net/content/dam/games/minecraft/logos/logo-minecraft.svg" alt="Minecraft Logo">
+    
     <div id="musicControl" class="music-control" onclick="toggleMusic()">
         <i class="fas fa-music"></i> Play Music
     </div>
